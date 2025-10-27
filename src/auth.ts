@@ -31,7 +31,7 @@ export interface DemoUser {
   id: string;
   email: string;
   role: string;
-  groups: { type: string; id: string; name: string }[];
+  groups: { type: string; id?: string; groupId?: string; name: string }[];
 }
 
 // Create a session JWT for the demo
