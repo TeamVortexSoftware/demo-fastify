@@ -30,7 +30,7 @@ const fastify = Fastify({
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 
-// Configure Vortex SDK
+// Configure Vortex SDK with new simplified format (recommended)
 configureVortex({
   apiKey: process.env.VORTEX_API_KEY || "demo-api-key",
 
@@ -42,13 +42,21 @@ configureVortex({
       return null;
     }
 
-    // Convert to Vortex format
+    // Use new simplified format (recommended)
+    return {
+      userId: user.id,
+      userEmail: user.email,
+      adminScopes: user.adminScopes,
+    };
+
+    /* Legacy format (deprecated but still supported):
     return {
       userId: user.id,
       identifiers: [{ type: "email", value: user.email }],
       groups: user.groups,
       role: user.role,
     };
+    */
   },
 
   // For demo purposes, allow all operations
@@ -76,7 +84,8 @@ fastify.addContentTypeParser(
 // Register plugins
 await fastify.register(fastifyCookie, {
   secret: process.env.COOKIE_SECRET || "demo-cookie-secret",
-  parseOptions: {},
+  hook: 'onRequest', // Parse cookies on every request
+  parseOptions: {}, // Options for cookie parsing
 });
 
 await fastify.register(fastifyStatic, {
@@ -103,13 +112,15 @@ fastify.post("/api/auth/login", async (request, reply) => {
     return reply.status(401).send({ error: "Invalid credentials" });
   }
 
-  // Create session JWT and set as cookie
+  // Create session JWT and set as signed cookie
   const sessionToken = createSessionJWT(user);
   reply.setCookie("session", sessionToken, {
+    path: "/", // Make cookie available for all routes
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000, // 1 day
+    signed: true, // Sign the cookie with the secret
   });
 
   return {
@@ -117,6 +128,7 @@ fastify.post("/api/auth/login", async (request, reply) => {
     user: {
       id: user.id,
       email: user.email,
+      adminScopes: user.adminScopes,
       role: user.role,
       groups: user.groups,
     },

@@ -26,8 +26,15 @@ This demo demonstrates:
 ## 🔧 Features
 
 ### Demo Users
-- **admin@example.com** / password123 (admin role)
-- **user@example.com** / userpass (user role)
+
+The demo includes two test users using the **new simplified JWT format**:
+
+| Email | Password | Admin Scopes | Legacy Role |
+|-------|----------|--------------|-------------|
+| admin@example.com | password123 | `['autoJoin']` | admin |
+| user@example.com | userpass | `[]` | user |
+
+The demo showcases both the new simplified format (user with `adminScopes` array) and the legacy format (`role` + `groups`) for educational purposes. See [server.ts](src/server.ts) for implementation details.
 
 ### Available Routes
 
@@ -89,11 +96,19 @@ curl -X POST http://localhost:3000/api/vortex/jwt \\
 The key difference from the Express demo is the use of Fastify's native plugin system:
 
 ```typescript
-// Configure Vortex first
+// Configure Vortex with new simplified format (recommended)
 configureVortex({
   apiKey: process.env.VORTEX_API_KEY || 'demo-api-key',
   authenticateUser: async (request, reply) => {
-    // Your auth logic here
+    const user = getCurrentUser(request);
+    if (!user) return null;
+
+    // Use new simplified format
+    return {
+      userId: user.id,
+      userEmail: user.email,
+      adminScopes: user.adminScopes,
+    };
   },
   ...createAllowAllAccessControl()
 });
@@ -101,6 +116,26 @@ configureVortex({
 // Register as a plugin
 await fastify.register(vortexPlugin, { prefix: '/api/vortex' });
 ```
+
+### JWT Format
+
+This demo uses Vortex's **new simplified JWT format** (recommended):
+
+```typescript
+// New simplified format in server.ts
+return {
+  userId: user.id,
+  userEmail: user.email,
+  adminScopes: user.adminScopes,
+};
+```
+
+The JWT payload includes:
+- `userId`: User's unique ID
+- `userEmail`: User's email address
+- `adminScopes`: Array of admin scopes (e.g., `['autoJoin']` for auto-join admin privileges)
+
+This replaces the legacy format with `identifiers`, `groups`, and `role` fields. The old format is still supported but deprecated. You can see both implementations commented in the [server.ts](src/server.ts) file.
 
 ### Performance Benefits
 - **Native Fastify Integration**: Uses FastifyRequest and FastifyReply directly
