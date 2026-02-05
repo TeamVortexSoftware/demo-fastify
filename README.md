@@ -5,7 +5,7 @@ A demonstration Fastify application showcasing the Vortex Fastify 5 SDK integrat
 ## 🚀 Quick Start
 
 ```bash
-cd apps/demo-fastify
+cd demos/demo-fastify
 pnpm install
 pnpm dev
 ```
@@ -170,7 +170,7 @@ This replaces the legacy format with `identifiers`, `groups`, and `role` fields.
 ## 📁 Project Structure
 
 ```
-apps/demo-fastify/
+demos/demo-fastify/
 ├── src/
 │   ├── auth.ts          # Authentication utilities (Fastify-adapted)
 │   └── server.ts        # Main Fastify server with Vortex plugin
@@ -258,9 +258,9 @@ This demo showcases Fastify's advantages:
 
 ## 🔗 Related
 
-- [Vortex Fastify SDK Documentation](../../packages/vortex-fastify-5-sdk/README.md)
-- [Vortex Express SDK Documentation](../../packages/vortex-express-5-sdk/README.md)
-- [Vortex Node SDK Documentation](../../packages/vortex-node-22-sdk/README.md)
+- [Vortex Fastify SDK Documentation](../../sdks/vortex-fastify-5-sdk/README.md)
+- [Vortex Express SDK Documentation](../../sdks/vortex-express-5-sdk/README.md)
+- [Vortex Node SDK Documentation](../../sdks/vortex-node-22-sdk/README.md)
 - [Vortex React Provider Documentation](../../packages/vortex-react-provider/README.md)
 
 ---
